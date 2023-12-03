@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Servicios</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            text-align: center;
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #800080; /* Purple */
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #800080; /* Purple */
+            color: white;
+        }
+
+        /* Added style for the button column */
+        .acciones-column button {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        /* Added style for the form rows */
+        .form-row, .form-row-create {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Servicios</h1>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Capacidad</th>
+            <th>Horario</th>
+            <th>Costo</th>
+            <th>Acciones</th>
+            <th><button onclick="handleCreateButton()">C</button></th> <!-- New column for Create button -->
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="servicio : ${servicios}">
+            <td th:text="${servicio.nombre}"></td>
+            <td th:text="${servicio.capacidad}"></td>
+            <td th:text="${servicio.horario}"></td>
+            <td th:text="${servicio.costo}"></td>
+            <!-- Add buttons for updating and deleting servicios -->
+            <td class="acciones-column">
+                <button th:data-servicioId="${servicio.id}" onclick="handleUpdateButton(this)">U</button>
+                <button th:data-servicioId="${servicio.id}" onclick="handleDeleteButton(this)">D</button>
+            </td>
+        </tr>
+
+        <!-- Form row for updating a servicio -->
+        <tr class="form-row" style="display: none;">
+            <td></td>
+            <td>
+                <form onsubmit="handleUpdateSubmit(event)">
+                    <!-- Hidden input for servicioId -->
+                    <input type="hidden" id="hiddenServicioId" name="hiddenServicioId" value="">
+                    <label for="nuevoNombre">Nuevo nombre:</label>
+                    <input type="text" id="nuevoNombre" name="nuevoNombre">
+                    <label for="nuevaCapacidad">Nueva capacidad:</label>
+                    <input type="text" id="nuevaCapacidad" name="nuevaCapacidad">
+                    <label for="nuevoHorario">Nuevo horario:</label>
+                    <input type="text" id="nuevoHorario" name="nuevoHorario">
+                    <label for="nuevoCosto">Nuevo costo:</label>
+                    <input type="text" id="nuevoCosto" name="nuevoCosto">
+                    <input type="submit" value="Guardar">
+                </form>
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
+
+        <!-- Form row for creating a new servicio -->
+        <tr class="form-row-create" style="display: none;">
+            <td></td>
+            <td>
+                <form onsubmit="handleCreateSubmit(event)">
+                    <label for="nuevoNombreCreate">Nuevo nombre:</label>
+                    <input type="text" id="nuevoNombreCreate" name="nuevoNombreCreate">
+                    <label for="nuevaCapacidadCreate">Nueva capacidad:</label>
+                    <input type="text" id="nuevaCapacidadCreate" name="nuevaCapacidadCreate">
+                    <label for="nuevoHorarioCreate">Nuevo horario:</label>
+                    <input type="text" id="nuevoHorarioCreate" name="nuevoHorarioCreate">
+                    <label for="nuevoCostoCreate">Nuevo costo:</label>
+                    <input type="text" id="nuevoCostoCreate" name="nuevoCostoCreate">
+                    <input type="submit" value="Guardar">
+                </form>
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
+
+        </tbody>
+    </table>
+</div>
+
+<script>
+     function handleDeleteButton(button) {
+        var servicioId = button.getAttribute('data-servicioId');
+        var url = '/deleteServicio/' + servicioId;
+
+        // Make an AJAX call to delete the tipo
+        fetch(url, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+            })
+            .then(response => {
+                if (response.ok) {
+                    location.reload();
+                } else {
+                    console.error('Error deleting servicio');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+    function handleUpdateButton(button) {
+        var servicioId = button.getAttribute('data-servicioId');
+
+        // Set the servicioId in the hidden input field
+        document.getElementById('hiddenServicioId').value = servicioId;
+
+        // Toggle visibility of the update form row
+        var formRow = document.querySelector('.form-row');
+        formRow.style.display = (formRow.style.display === 'none' || formRow.style.display === '') ? 'table-row' : 'none';
+    }
+
+
+    function handleCreateButton() {
+        // Toggle visibility of the create form row
+        var formRowCreate = document.querySelector('.form-row-create');
+        formRowCreate.style.display = (formRowCreate.style.display === 'none' || formRowCreate.style.display === '') ? 'table-row' : 'none';
+    }
+
+    function handleUpdateSubmit(event) {
+        event.preventDefault();
+
+        var nuevoNombreInput = document.getElementById('nuevoNombre');
+        var nuevoNombreValue = nuevoNombreInput.value;
+
+        var nuevaCapacidadInput = document.getElementById('nuevaCapacidad');
+        var nuevaCapacidadValue = nuevaCapacidadInput.value;
+
+        var nuevoHorarioInput = document.getElementById('nuevoHorario');
+        var nuevoHorarioValue = nuevoHorarioInput.value;
+
+        var nuevoCostoInput = document.getElementById('nuevoCosto');
+        var nuevoCostoValue = nuevoCostoInput.value;
+
+        // Get the servicioId from the hidden input field
+        var servicioId = document.getElementById('hiddenServicioId').value;
+        var url = '/updateServicio/' + servicioId;
+
+        // Make an AJAX call to update the servicio details
+        fetch(url, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'nombre=' + encodeURIComponent(nuevoNombreValue) +
+                '&capacidad=' + encodeURIComponent(nuevaCapacidadValue) +
+                '&horario=' + encodeURIComponent(nuevoHorarioValue) +
+                '&costo=' + encodeURIComponent(nuevoCostoValue),
+        })
+        .then(response => {
+            if (response.ok) {
+                // Reload the page to reflect the changes
+                location.reload();
+            } else {
+                console.error('Error updating servicio details');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+
+    function handleCreateSubmit(event) {
+        event.preventDefault();
+
+        var nuevoNombreCreateInput = document.getElementById('nuevoNombreCreate');
+        var nuevoNombreCreateValue = nuevoNombreCreateInput.value;
+
+        var nuevaCapacidadCreateInput = document.getElementById('nuevaCapacidadCreate');
+        var nuevaCapacidadCreateValue = nuevaCapacidadCreateInput.value;
+
+        var nuevoHorarioCreateInput = document.getElementById('nuevoHorarioCreate');
+        var nuevoHorarioCreateValue = nuevoHorarioCreateInput.value;
+
+        var nuevoCostoCreateInput = document.getElementById('nuevoCostoCreate');
+        var nuevoCostoCreateValue = nuevoCostoCreateInput.value;
+
+        // Make an AJAX call to create a new servicio
+        fetch('/createServicio', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'nombre=' + encodeURIComponent(nuevoNombreCreateValue) +
+                '&capacidad=' + encodeURIComponent(nuevaCapacidadCreateValue) +
+                '&horario=' + encodeURIComponent(nuevoHorarioCreateValue) +
+                '&costo=' + encodeURIComponent(nuevoCostoCreateValue),
+        })
+        .then(response => {
+            if (response.ok) {
+                // Reload the page to reflect the changes
+                location.reload();
+            } else {
+                console.error('Error creating new servicio');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+</script>
+
+</body>
+</html>

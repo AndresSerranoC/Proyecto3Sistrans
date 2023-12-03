@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reservas</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            text-align: center;
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #800080; /* Purple */
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #800080; /* Purple */
+            color: white;
+        }
+
+        .acciones-column button {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .acciones-column-create button {
+            background-color: #2196F3; /* Blue */
+            color: white;
+        }
+
+        .form-row, .form-row-create {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Reservas</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Número de reserva</th>
+                <th>Fecha entrada</th>
+                <th>Fecha salida</th>
+                <th>Número de personas</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+                <th><button onclick="handleCreateButton()">C</button></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="reserva, iterStat : ${reservas}">
+                <td th:text="${reserva.id}">Número de reserva</td>
+                <td th:text="${#dates.format(reserva.fechaEntrada, 'yyyy-MM-dd')}">Fecha entrada</td>
+                <td th:text="${#dates.format(reserva.fechaSalida, 'yyyy-MM-dd')}">Fecha salida</td>
+                <td th:text="${reserva.numeroPersonas}">Número de personas</td>
+                <td th:text="${reserva.estado}">Estado</td>
+                <td class="acciones-column">
+                    <button th:data-reserva-id="${reserva.id}" onclick="handleButtonClick(this)">U</button>
+                </td>
+            </tr>
+
+            <!-- Form row for updating a reserva -->
+            <tr class="form-row" style="display: none;">
+                <td colspan="6">
+                    <form onsubmit="handleSubmit(event)">
+                        <input type="hidden" id="hiddenReservaId" name="hiddenReservaId" value="">
+                        <label for="nuevaFechaEntrada">Nueva fecha entrada:</label>
+                        <input type="text" id="nuevaFechaEntrada" name="nuevaFechaEntrada">
+
+                        <label for="nuevaFechaSalida">Nueva fecha salida:</label>
+                        <input type="text" id="nuevaFechaSalida" name="nuevaFechaSalida">
+
+                        <label for="nuevoNumPersonas">Nuevo número de personas:</label>
+                        <input type="text" id="nuevoNumPersonas" name="nuevoNumPersonas">
+
+                        <label for="nuevoEstado">Nuevo estado:</label>
+                        <input type="text" id="nuevoEstado" name="nuevoEstado">
+
+                        <input type="submit" value="Guardar">
+                    </form>
+                </td>
+            </tr>
+
+            <!-- Form row for creating a new reserva -->
+            <!-- Form row for creating a new reserva -->
+<tr class="form-row-create" style="display: none;">
+    <td colspan="6">
+        <form onsubmit="handleCreateSubmit(event)">
+            <label for="nuevaFechaEntradaCreate">Nueva fecha entrada:</label>
+            <input type="text" id="nuevaFechaEntradaCreate" name="nuevaFechaEntradaCreate">
+
+            <label for="nuevaFechaSalidaCreate">Nueva fecha salida:</label>
+            <input type="text" id="nuevaFechaSalidaCreate" name="nuevaFechaSalidaCreate">
+
+            <label for="nuevoNumPersonasCreate">Nuevo número de personas:</label>
+            <input type="text" id="nuevoNumPersonasCreate" name="nuevoNumPersonasCreate">
+
+            <label for="nuevoEstadoCreate">Nuevo estado:</label>
+            <input type="text" id="nuevoEstadoCreate" name="nuevoEstadoCreate">
+
+            <input type="submit" value="Guardar">
+        </form>
+    </td>
+</tr>
+
+        </tbody>
+    </table>
+</div>
+
+<script>
+    function handleButtonClick(button) {
+        var reservaId = button.getAttribute('data-reserva-id');
+        document.getElementById('hiddenReservaId').value = reservaId;
+
+        var formRow = document.querySelector('.form-row');
+        formRow.style.display = (formRow.style.display === 'none' || formRow.style.display === '') ? 'table-row' : 'none';
+    }
+
+    function handleSubmit(event) {
+        event.preventDefault();
+
+        var nuevaFechaEntradaInput = document.getElementById('nuevaFechaEntrada');
+        var nuevaFechaSalidaInput = document.getElementById('nuevaFechaSalida');
+        var nuevoNumPersonasInput = document.getElementById('nuevoNumPersonas');
+        var nuevoEstadoInput = document.getElementById('nuevoEstado');
+
+        var nuevaFechaEntradaValue = nuevaFechaEntradaInput.value;
+        var nuevaFechaSalidaValue = nuevaFechaSalidaInput.value;
+        var nuevoNumPersonasValue = nuevoNumPersonasInput.value;
+        var nuevoEstadoValue = nuevoEstadoInput.value;
+
+        var reservaId = document.getElementById('hiddenReservaId').value;
+        var url = '/reservas/updateReserva?id=' + reservaId;
+
+        fetch(url, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'fechaEntrada=' + encodeURIComponent(nuevaFechaEntradaValue) +
+                  '&fechaSalida=' + encodeURIComponent(nuevaFechaSalidaValue) +
+                  '&numPersonas=' + encodeURIComponent(nuevoNumPersonasValue) +
+                  '&estado=' + encodeURIComponent(nuevoEstadoValue),
+        })
+        .then(response => {
+            if (response.ok) {
+                location.reload();
+            } else {
+                console.error('Error updating reserva');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+
+    function handleCreateButton() {
+        var formRowCreate = document.querySelector('.form-row-create');
+        formRowCreate.style.display = (formRowCreate.style.display === 'none' || formRowCreate.style.display === '') ? 'table-row' : 'none';
+    }
+
+    function handleCreateSubmit(event) {
+        event.preventDefault();
+
+        var nuevaFechaEntradaCreateInput = document.getElementById('nuevaFechaEntradaCreate');
+        var nuevaFechaSalidaCreateInput = document.getElementById('nuevaFechaSalidaCreate');
+        var nuevoNumPersonasCreateInput = document.getElementById('nuevoNumPersonasCreate');
+        var nuevoEstadoCreateInput = document.getElementById('nuevoEstadoCreate');
+
+        var nuevaFechaEntradaCreateValue = nuevaFechaEntradaCreateInput.value;
+        var nuevaFechaSalidaCreateValue = nuevaFechaSalidaCreateInput.value;
+        var nuevoNumPersonasCreateValue = nuevoNumPersonasCreateInput.value;
+        var nuevoEstadoCreateValue = nuevoEstadoCreateInput.value;
+
+        fetch('/reservas/createReserva', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'fechaEntrada=' + encodeURIComponent(nuevaFechaEntradaCreateValue) +
+                  '&fechaSalida=' + encodeURIComponent(nuevaFechaSalidaCreateValue) +
+                  '&numPersonas=' + encodeURIComponent(nuevoNumPersonasCreateValue) +
+                  '&estado=' + encodeURIComponent(nuevoEstadoCreateValue),
+        })
+        .then(response => {
+            if (response.ok) {
+                location.reload();
+            } else {
+                console.error('Error creating new reserva');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+</script>
+
+</body>
+</html>

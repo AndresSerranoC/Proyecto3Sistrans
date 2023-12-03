@@ -1,8 +1,8 @@
 spring:
   data:
     mongodb:
-      uri: CAMBIAR_ESTO_POR_LA_URI_DE_CONEXION
-      database: CAMBIAR_ESTO_POR_EL_NAME_DE_LA_BASE_DE_DATOS_A_USAR
+      uri: mongodb://localhost:27017
+      database: Hotel
 
   thymeleaf:
     prefix: classpath:/templates/

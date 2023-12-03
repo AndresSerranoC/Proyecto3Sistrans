@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Habitaciones</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            text-align: center;
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #800080; /* Purple */
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #800080; /* Purple */
+            color: white;
+        }
+
+        /* Added style for the button column */
+        .acciones-column button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        /* Added style for the form row */
+        .form-row {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Habitaciones</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Número</th>
+                <th>Tipo</th>
+                <th>Capacidad máxima</th>
+                <th>Dotación</th>
+                <th>Estado</th>
+                <th>Tarifa</th>
+                <th>Acciones</th>
+                <th>
+                    <button class="acciones-column button delete-button" onclick="handleCreateButton()">C</button>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="habitacion, iterStat : ${habitaciones}">
+                <td th:text="${iterStat.count}">1</td>
+                <td th:text="${habitacion.tipo}">Tipo</td>
+                <td th:text="${habitacion.capacidadMax}">Capacidad Máxima</td>
+                <td th:text="${habitacion.dotacion}">Dotación</td>
+                <td th:text="${habitacion.estado}">Estado</td>
+                <td th:text="${habitacion.tarifa}">Tarifa</td>
+                <td class="acciones-column">
+                    <!-- Updated Thymeleaf attribute in the button -->
+                    <button th:data-habitacion-id="${habitacion.id}" onclick="handleButtonClick(this)">U</button>
+                    <button class="acciones-column button delete-button" th:data-habitacion-id="${habitacion.id}" onclick="handleDeleteButtonClick(this)">D</button>
+                </td>
+            </tr>
+        
+            <!-- Form row for updating a habitacion -->
+            <tr class="form-row" style="display: none;">
+                <td></td>
+                <td>
+                    <form onsubmit="handleSubmit(event)">
+                        <!-- Updated hidden input ID for habitacionId -->
+                        <input type="hidden" id="hiddenHabitacionId" name="hiddenHabitacionId" value="">
+                        <label for="nuevaTipo">Nuevo tipo:</label>
+                        <select id="nuevaTipo" name="nuevaTipo">
+                            <!-- Thymeleaf iteration over the tipos -->
+                            <option th:each="tipo : ${tipos}" th:value="${tipo.id}" th:text="${tipo.nombre}"></option>
+                        </select>
+                        <label for="nuevaCapacidadMaxima">Nueva capacidad máxima:</label>
+                        <input type="text" id="nuevaCapacidadMaxima" name="nuevaCapacidadMaxima">
+                        <label for="nuevaDotacion">Nueva dotación:</label>
+                        <input type="text" id="nuevaDotacion" name="nuevaDotacion">
+                        <label for="nuevoEstado">Nuevo estado:</label>
+                        <input type="text" id="nuevoEstado" name="nuevoEstado">
+                        <label for="nuevaTarifa">Nueva tarifa:</label>
+                        <input type="text" id="nuevaTarifa" name="nuevaTarifa">
+                        <input type="submit" value="Guardar">
+                    </form>
+                </td>
+                <td></td>
+            </tr>
+
+            <!-- Form row for creating a new habitacion -->
+            <tr class="form-row-create" style="display: none;">
+                <td></td>
+                <td>
+                    <form onsubmit="handleCreateSubmit(event)">
+                        <label for="nuevaTipoCreate">Nuevo tipo:</label>
+                        <!-- Updated input to a dropdown/select element -->
+                        <select id="nuevaTipoCreate" name="nuevaTipoCreate">
+                            <!-- Thymeleaf iteration over the tipos -->
+                            <option th:each="tipo : ${tipos}" th:value="${tipo.id}" th:text="${tipo.nombre}"></option>
+                        </select>
+                        <label for="nuevaCapacidadMaximaCreate">Nueva capacidad máxima:</label>
+                        <input type="text" id="nuevaCapacidadMaximaCreate" name="nuevaCapacidadMaximaCreate">
+                        <label for="nuevaDotacionCreate">Nueva dotación:</label>
+                        <input type="text" id="nuevaDotacionCreate" name="nuevaDotacionCreate">
+                        <label for="nuevoEstadoCreate">Nuevo estado:</label>
+                        <input type="text" id="nuevoEstadoCreate" name="nuevoEstadoCreate">
+                        <label for="nuevaTarifaCreate">Nueva tarifa:</label>
+                        <input type="text" id="nuevaTarifaCreate" name="nuevaTarifaCreate">
+                        <input type="submit" value="Guardar">
+                    </form>
+                </td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<script>
+    function handleButtonClick(button) {
+        var habitacionId = button.getAttribute('data-habitacion-id');
+        
+        // Set the habitacionId in the hidden input field
+        document.getElementById('hiddenHabitacionId').value = habitacionId;
+
+        // Toggle visibility of the form row
+        var formRow = document.querySelector('.form-row');
+        formRow.style.display = (formRow.style.display === 'none' || formRow.style.display === '') ? 'table-row' : 'none';
+    }
+
+    function handleCreateButton() {
+        // Toggle visibility of the create form row
+        var formRowCreate = document.querySelector('.form-row-create');
+        formRowCreate.style.display = (formRowCreate.style.display === 'none' || formRowCreate.style.display === '') ? 'table-row' : 'none';
+    }
+    
+    function handleDeleteButtonClick(button) {
+        var habitacionId = button.getAttribute('data-habitacion-id');
+        var url = '/habitaciones/deleteHabitacion/' + habitacionId;
+
+        // Make an AJAX call to delete the tipo
+        fetch(url, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+            })
+            .then(response => {
+                if (response.ok) {
+                    location.reload();
+                } else {
+                    console.error('Error deleting tipo');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+
+    function handleSubmit(event) {
+        event.preventDefault();
+
+        var nuevaTipoInput = document.getElementById('nuevaTipo');
+        var nuevaCapacidadMaximaInput = document.getElementById('nuevaCapacidadMaxima');
+        var nuevaDotacionInput = document.getElementById('nuevaDotacion');
+        var nuevoEstadoInput = document.getElementById('nuevoEstado');
+        var nuevaTarifaInput = document.getElementById('nuevaTarifa');
+
+        var nuevaTipoValue = nuevaTipoInput.value;
+        var nuevaCapacidadMaximaValue = nuevaCapacidadMaximaInput.value;
+        var nuevaDotacionValue = nuevaDotacionInput.value;
+        var nuevoEstadoValue = nuevoEstadoInput.value;
+        var nuevaTarifaValue = nuevaTarifaInput.value;
+
+        // Get the habitacionId from the hidden input field
+        var habitacionId = document.getElementById('hiddenHabitacionId').value;
+        var url = '/habitaciones/updateHabitacion/' + habitacionId; // Updated URL
+
+        // Make an AJAX call to update the habitacion
+        fetch(url, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'tipo=' + encodeURIComponent(nuevaTipoValue) +
+                  '&capacidadMaxima=' + encodeURIComponent(nuevaCapacidadMaximaValue) +
+                  '&dotacion=' + encodeURIComponent(nuevaDotacionValue) +
+                  '&estado=' + encodeURIComponent(nuevoEstadoValue) +
+                  '&tarifa=' + encodeURIComponent(nuevaTarifaValue),
+        })
+        .then(response => {
+            if (response.ok) {
+                // Reload the page to reflect the changes
+                location.reload();
+            } else {
+                console.error('Error updating habitacion');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+
+    function handleCreateSubmit(event) {
+        event.preventDefault();
+
+        var nuevaTipoCreateInput = document.getElementById('nuevaTipoCreate');
+        var nuevaCapacidadMaximaCreateInput = document.getElementById('nuevaCapacidadMaximaCreate');
+        var nuevaDotacionCreateInput = document.getElementById('nuevaDotacionCreate');
+        var nuevoEstadoCreateInput = document.getElementById('nuevoEstadoCreate');
+        var nuevaTarifaCreateInput = document.getElementById('nuevaTarifaCreate');
+
+        var nuevaTipoCreateValue = nuevaTipoCreateInput.value;
+        var nuevaCapacidadMaximaCreateValue = nuevaCapacidadMaximaCreateInput.value;
+        var nuevaDotacionCreateValue = nuevaDotacionCreateInput.value;
+        var nuevoEstadoCreateValue = nuevoEstadoCreateInput.value;
+        var nuevaTarifaCreateValue = nuevaTarifaCreateInput.value;
+
+        // Make an AJAX call to create a new habitacion
+        fetch('/habitaciones/createHabitacion', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'tipo=' + encodeURIComponent(nuevaTipoCreateValue) +
+                  '&capacidadMaxima=' + encodeURIComponent(nuevaCapacidadMaximaCreateValue) +
+                  '&dotacion=' + encodeURIComponent(nuevaDotacionCreateValue) +
+                  '&estado=' + encodeURIComponent(nuevoEstadoCreateValue) +
+                  '&tarifa=' + encodeURIComponent(nuevaTarifaCreateValue),
+        })
+        .then(response => {
+            if (response.ok) {
+                // Reload the page to reflect the changes
+                location.reload();
+            } else {
+                console.error('Error creating new habitacion');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+</script>
+
+</body>
+</html>
