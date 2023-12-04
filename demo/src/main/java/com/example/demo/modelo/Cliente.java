@@ -3,6 +3,7 @@ package com.example.demo.modelo;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.Date;
 import java.util.List;
 
 @Document(collection = "clientes")
@@ -15,9 +16,11 @@ public class Cliente {
     private String telefono;
     private String nombre;
     private String apellido;
+    private List<Date> fechaLlegada;
+    private List<Date> fechaSalida;
 
-    private List<Reserva> reservas;
-    private List<Consumo> consumos;
+    private List<String> reservas;
+    private List<String> consumos;
 
     public String getId() {
         return id;
@@ -59,20 +62,36 @@ public class Cliente {
         this.apellido = apellido;
     }
 
-    public List<Reserva> getReservas() {
+    public List<String> getReservas() {
         return reservas;
     }
 
-    public void setReservas(List<Reserva> reservas) {
+    public void setReservas(List<String> reservas) {
         this.reservas = reservas;
     }
 
-    public List<Consumo> getConsumos() {
+    public List<String> getConsumos() {
         return consumos;
     }
 
-    public void setConsumos(List<Consumo> consumos) {
+    public void setConsumos(List<String> consumos) {
         this.consumos = consumos;
+    }
+
+    public List<Date> getFechaLlegada() {
+        return fechaLlegada;
+    }
+
+    public void setFechaLlegada(List<Date> fechaLlegada) {
+        this.fechaLlegada = fechaLlegada;
+    }
+
+    public List<Date> getFechaSalida() {
+        return fechaSalida;
+    }
+
+    public void setFechaSalida(List<Date> fechaSalida) {
+        this.fechaSalida = fechaSalida;
     }
 
 }

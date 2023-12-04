@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -25,7 +26,8 @@
         }
 
         h1 {
-            color: #800080; /* Purple */
+            color: #800080;
+            /* Purple */
         }
 
         table {
@@ -34,23 +36,44 @@
             margin-top: 20px;
         }
 
-        th, td {
+        th,
+        td {
             padding: 12px;
             text-align: left;
             border-bottom: 1px solid #ddd;
         }
 
         th {
-            background-color: #800080; /* Purple */
+            background-color: #800080;
+            /* Purple */
             color: white;
+        }
+
+        /* Updated style for the button column */
+        .acciones-column button {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        /* Updated style for all buttons to be green */
+        button {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        /* Updated style for the form rows */
+        .form-row-update,
+        .form-row-create {
+            display: none;
         }
     </style>
 </head>
+
 <body>
 
     <div class="container">
         <h1>Lista de Consumos</h1>
-        
+
         <table>
             <thead>
                 <tr>
@@ -59,20 +82,187 @@
                     <th>Descripción</th>
                     <th>Cantidad</th>
                     <th>Total</th>
+                    <th>Acciones</th>
+                    <th>
+                        <button onclick="handleCreateButton()">C</button>
+                        <!-- New column for Create and Delete buttons -->
+                    </th>
                 </tr>
             </thead>
             <tbody>
                 <!-- Iterate over consumos and populate the table -->
                 <tr th:each="consumo : ${consumos}">
-                    <td th:text="${consumo.id}">1</td>
-                    <td th:text="${#dates.format(consumo.fecha, 'yyyy-MM-dd')}">2023-01-01</td>
-                    <td th:text="${consumo.descripcion}">Item A</td>
-                    <td th:text="${consumo.cantidad}">2</td>
-                    <td th:text="${consumo.total}">$50.00</td>
+                    <td th:text="${consumo.id}"></td>
+                    <td th:text="${#dates.format(consumo.fecha, 'yyyy-MM-dd')}"></td>
+                    <td th:text="${consumo.descripcion}"></td>
+                    <td th:text="${consumo.cantidad}"></td>
+                    <td th:text="${consumo.total}"></td>
+                    <td class="acciones-column">
+                        <button th:data-consumoId="${consumo.id}" onclick="handleUpdateButton(this)">U</button>
+                    </td>
+                    <td>
+                        <button th:data-consumoId="${consumo.id}" onclick="handleDeleteButtonClick(this)">D</button>
+                    </td>
                 </tr>
+
+                <!-- Form row for updating a consumo -->
+                <tr class="form-row-update" style="display: none;">
+                    <td>
+                        <form onsubmit="handleUpdateSubmit(event)">
+                            <!-- Hidden input for consumoId -->
+                            <input type="hidden" id="hiddenConsumoId" name="hiddenConsumoId" value="">
+                            <label for="nuevaFecha">Nueva fecha:</label>
+                            <input type="date" id="nuevaFecha" name="nuevaFecha" required>
+                            <label for="nuevaDescripcion">Nueva descripción:</label>
+                            <input type="text" id="nuevaDescripcion" name="nuevaDescripcion" required>
+                            <label for="nuevaCantidad">Nueva cantidad:</label>
+                            <input type="number" id="nuevaCantidad" name="nuevaCantidad" required>
+                            <label for="nuevoTotal">Nuevo total:</label>
+                            <input type="number" id="nuevoTotal" name="nuevoTotal" required>
+                            <input type="submit" value="Guardar">
+                        </form>
+                    </td>
+                </tr>
+
+                <!-- Form row for creating a new consumo -->
+                <tr class="form-row-create" style="display: none;">
+                    <td>
+                        <form onsubmit="handleCreateSubmit(event)">
+                            <label for="nuevaFechaCreate">Fecha:</label>
+                            <input type="date" id="nuevaFechaCreate" name="nuevaFechaCreate" required>
+                            <label for="nuevaDescripcionCreate">Descripción:</label>
+                            <input type="text" id="nuevaDescripcionCreate" name="nuevaDescripcionCreate" required>
+                            <label for="nuevaCantidadCreate">Cantidad:</label>
+                            <input type="number" id="nuevaCantidadCreate" name="nuevaCantidadCreate" required>
+                            <label for="nuevoTotalCreate">Total:</label>
+                            <input type="number" id="nuevoTotalCreate" name="nuevoTotalCreate" required>
+                            <input type="submit" value="Guardar">
+                        </form>
+                    </td>
+                </tr>
+
             </tbody>
         </table>
     </div>
 
+    <script>
+        function handleDeleteButtonClick(button) {
+            var consumoId = button.getAttribute('data-consumoId');
+            var url = '/consumos/deleteConsumo/' + consumoId;
+
+            // Make an AJAX call to delete the tipo
+            fetch(url, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                })
+                .then(response => {
+                    if (response.ok) {
+                        // Reload the page to reflect the changes
+                        location.reload();
+                    } else {
+                        console.error('Error deleting tipo');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+        function handleCreateButton() {
+            // Toggle visibility of the create form row
+            var formRowCreate = document.querySelector('.form-row-create');
+            formRowCreate.style.display = (formRowCreate.style.display === 'none' || formRowCreate.style.display === '') ? 'table-row' : 'none';
+        }
+        function handleUpdateButton(button) {
+            var consumoId = button.getAttribute('data-consumoId');
+
+            document.getElementById('hiddenConsumoId').value = consumoId;
+
+            // Toggle visibility of the update form row
+            var formRowUpdate = document.querySelector('.form-row-update');
+            formRowUpdate.style.display = (formRowUpdate.style.display === 'none' || formRowUpdate.style.display === '') ? 'table-row' : 'none';
+        }
+
+        function handleCreateSubmit(event) {
+            event.preventDefault();
+
+            var nuevaFechaCreateInput = document.getElementById('nuevaFechaCreate');
+            var nuevaDescripcionCreateInput = document.getElementById('nuevaDescripcionCreate');
+            var nuevaCantidadCreateInput = document.getElementById('nuevaCantidadCreate');
+            var nuevoTotalCreateInput = document.getElementById('nuevoTotalCreate');
+
+            var nuevaFechaCreateValue = nuevaFechaCreateInput.value;
+            var nuevaDescripcionCreateValue = nuevaDescripcionCreateInput.value;
+            var nuevaCantidadCreateValue = nuevaCantidadCreateInput.value;
+            var nuevoTotalCreateValue = nuevoTotalCreateInput.value;
+
+            // Make an AJAX call to create a new consumo
+            fetch('/consumos/createConsumo', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'fecha=' + encodeURIComponent(nuevaFechaCreateValue) +
+                        '&descripcion=' + encodeURIComponent(nuevaDescripcionCreateValue) +
+                        '&cantidad=' + encodeURIComponent(nuevaCantidadCreateValue) +
+                        '&total=' + encodeURIComponent(nuevoTotalCreateValue),
+                })
+                .then(response => {
+                    if (response.ok) {
+                        // Reload the page to reflect the changes
+                        location.reload();
+                    } else {
+                        console.error('Error creating new consumo');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+
+        function handleUpdateSubmit(event) {
+            event.preventDefault();
+
+            var nuevaFechaInput = document.getElementById('nuevaFecha');
+            var nuevaDescripcionInput = document.getElementById('nuevaDescripcion');
+            var nuevaCantidadInput = document.getElementById('nuevaCantidad');
+            var nuevoTotalInput = document.getElementById('nuevoTotal');
+
+            var nuevaFechaValue = nuevaFechaInput.value;
+            var nuevaDescripcionValue = nuevaDescripcionInput.value;
+            var nuevaCantidadValue = nuevaCantidadInput.value;
+            var nuevoTotalValue = nuevoTotalInput.value;
+
+            // Get the consumoId from the hidden input field
+            var consumoId = document.getElementById('hiddenConsumoId').value;
+            var url = '/consumos/updateConsumo/' + consumoId;
+
+            // Make an AJAX call to update the consumo
+            fetch(url, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'fecha=' + encodeURIComponent(nuevaFechaValue) +
+                        '&descripcion=' + encodeURIComponent(nuevaDescripcionValue) +
+                        '&cantidad=' + encodeURIComponent(nuevaCantidadValue) +
+                        '&total=' + encodeURIComponent(nuevoTotalValue),
+                })
+                .then(response => {
+                    if (response.ok) {
+                        // Reload the page to reflect the changes
+                        location.reload();
+                    } else {
+                        console.error('Error updating consumo');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+    </script>
+
 </body>
+
 </html>

@@ -31,7 +31,7 @@ public class ReservaController {
     public String getAllReservas(Model model) {
         List<Reserva> reservas = reservaRepository.findAll();
         model.addAttribute("reservas", reservas);
-        return "reservas"; // Assuming your Thymeleaf template is named "reservas.html"
+        return "reservas";
     }
 
     @PutMapping("/updateReserva")
