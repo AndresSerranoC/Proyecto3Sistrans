@@ -25,7 +25,7 @@
         }
 
         h1 {
-            color: #800080; /* Purple */
+            color: #800080; 
         }
 
         table {
@@ -41,11 +41,10 @@
         }
 
         th {
-            background-color: #800080; /* Purple */
+            background-color: #800080; 
             color: white;
         }
 
-        /* Added style for the button column */
         .acciones-column button {
             background-color: #4CAF50;
             color: white;
@@ -60,7 +59,6 @@
             border-radius: 4px;
         }
 
-        /* Added style for the form row */
         .form-row {
             display: none;
         }
@@ -95,22 +93,18 @@
                 <td th:text="${habitacion.estado}">Estado</td>
                 <td th:text="${habitacion.tarifa}">Tarifa</td>
                 <td class="acciones-column">
-                    <!-- Updated Thymeleaf attribute in the button -->
                     <button th:data-habitacion-id="${habitacion.id}" onclick="handleButtonClick(this)">U</button>
                     <button class="acciones-column button delete-button" th:data-habitacion-id="${habitacion.id}" onclick="handleDeleteButtonClick(this)">D</button>
                 </td>
             </tr>
         
-            <!-- Form row for updating a habitacion -->
             <tr class="form-row" style="display: none;">
                 <td></td>
                 <td>
                     <form onsubmit="handleSubmit(event)">
-                        <!-- Updated hidden input ID for habitacionId -->
                         <input type="hidden" id="hiddenHabitacionId" name="hiddenHabitacionId" value="">
                         <label for="nuevaTipo">Nuevo tipo:</label>
                         <select id="nuevaTipo" name="nuevaTipo">
-                            <!-- Thymeleaf iteration over the tipos -->
                             <option th:each="tipo : ${tipos}" th:value="${tipo.id}" th:text="${tipo.nombre}"></option>
                         </select>
                         <label for="nuevaCapacidadMaxima">Nueva capacidad máxima:</label>
@@ -127,15 +121,12 @@
                 <td></td>
             </tr>
 
-            <!-- Form row for creating a new habitacion -->
             <tr class="form-row-create" style="display: none;">
                 <td></td>
                 <td>
                     <form onsubmit="handleCreateSubmit(event)">
                         <label for="nuevaTipoCreate">Nuevo tipo:</label>
-                        <!-- Updated input to a dropdown/select element -->
                         <select id="nuevaTipoCreate" name="nuevaTipoCreate">
-                            <!-- Thymeleaf iteration over the tipos -->
                             <option th:each="tipo : ${tipos}" th:value="${tipo.id}" th:text="${tipo.nombre}"></option>
                         </select>
                         <label for="nuevaCapacidadMaximaCreate">Nueva capacidad máxima:</label>
@@ -159,16 +150,13 @@
     function handleButtonClick(button) {
         var habitacionId = button.getAttribute('data-habitacion-id');
         
-        // Set the habitacionId in the hidden input field
         document.getElementById('hiddenHabitacionId').value = habitacionId;
 
-        // Toggle visibility of the form row
         var formRow = document.querySelector('.form-row');
         formRow.style.display = (formRow.style.display === 'none' || formRow.style.display === '') ? 'table-row' : 'none';
     }
 
     function handleCreateButton() {
-        // Toggle visibility of the create form row
         var formRowCreate = document.querySelector('.form-row-create');
         formRowCreate.style.display = (formRowCreate.style.display === 'none' || formRowCreate.style.display === '') ? 'table-row' : 'none';
     }
@@ -177,7 +165,6 @@
         var habitacionId = button.getAttribute('data-habitacion-id');
         var url = '/habitaciones/deleteHabitacion/' + habitacionId;
 
-        // Make an AJAX call to delete the tipo
         fetch(url, {
                 method: 'DELETE',
                 headers: {
@@ -211,11 +198,9 @@
         var nuevoEstadoValue = nuevoEstadoInput.value;
         var nuevaTarifaValue = nuevaTarifaInput.value;
 
-        // Get the habitacionId from the hidden input field
         var habitacionId = document.getElementById('hiddenHabitacionId').value;
-        var url = '/habitaciones/updateHabitacion/' + habitacionId; // Updated URL
+        var url = '/habitaciones/updateHabitacion/' + habitacionId; 
 
-        // Make an AJAX call to update the habitacion
         fetch(url, {
             method: 'PUT',
             headers: {
@@ -229,7 +214,6 @@
         })
         .then(response => {
             if (response.ok) {
-                // Reload the page to reflect the changes
                 location.reload();
             } else {
                 console.error('Error updating habitacion');
@@ -255,7 +239,6 @@
         var nuevoEstadoCreateValue = nuevoEstadoCreateInput.value;
         var nuevaTarifaCreateValue = nuevaTarifaCreateInput.value;
 
-        // Make an AJAX call to create a new habitacion
         fetch('/habitaciones/createHabitacion', {
             method: 'POST',
             headers: {
@@ -269,7 +252,6 @@
         })
         .then(response => {
             if (response.ok) {
-                // Reload the page to reflect the changes
                 location.reload();
             } else {
                 console.error('Error creating new habitacion');

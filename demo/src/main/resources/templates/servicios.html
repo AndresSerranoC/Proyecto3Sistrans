@@ -25,7 +25,7 @@
         }
 
         h1 {
-            color: #800080; /* Purple */
+            color: #800080; 
         }
 
         table {
@@ -41,17 +41,15 @@
         }
 
         th {
-            background-color: #800080; /* Purple */
+            background-color: #800080; 
             color: white;
         }
 
-        /* Added style for the button column */
         .acciones-column button {
             background-color: #4CAF50;
             color: white;
         }
 
-        /* Added style for the form rows */
         .form-row, .form-row-create {
             display: none;
         }
@@ -79,19 +77,16 @@
             <td th:text="${servicio.capacidad}"></td>
             <td th:text="${servicio.horario}"></td>
             <td th:text="${servicio.costo}"></td>
-            <!-- Add buttons for updating and deleting servicios -->
             <td class="acciones-column">
                 <button th:data-servicioId="${servicio.id}" onclick="handleUpdateButton(this)">U</button>
                 <button th:data-servicioId="${servicio.id}" onclick="handleDeleteButton(this)">D</button>
             </td>
         </tr>
 
-        <!-- Form row for updating a servicio -->
         <tr class="form-row" style="display: none;">
             <td></td>
             <td>
                 <form onsubmit="handleUpdateSubmit(event)">
-                    <!-- Hidden input for servicioId -->
                     <input type="hidden" id="hiddenServicioId" name="hiddenServicioId" value="">
                     <label for="nuevoNombre">Nuevo nombre:</label>
                     <input type="text" id="nuevoNombre" name="nuevoNombre">
@@ -108,7 +103,6 @@
             <td></td>
         </tr>
 
-        <!-- Form row for creating a new servicio -->
         <tr class="form-row-create" style="display: none;">
             <td></td>
             <td>
@@ -137,7 +131,6 @@
         var servicioId = button.getAttribute('data-servicioId');
         var url = '/deleteServicio/' + servicioId;
 
-        // Make an AJAX call to delete the tipo
         fetch(url, {
                 method: 'DELETE',
                 headers: {
@@ -158,17 +151,14 @@
     function handleUpdateButton(button) {
         var servicioId = button.getAttribute('data-servicioId');
 
-        // Set the servicioId in the hidden input field
         document.getElementById('hiddenServicioId').value = servicioId;
 
-        // Toggle visibility of the update form row
         var formRow = document.querySelector('.form-row');
         formRow.style.display = (formRow.style.display === 'none' || formRow.style.display === '') ? 'table-row' : 'none';
     }
 
 
     function handleCreateButton() {
-        // Toggle visibility of the create form row
         var formRowCreate = document.querySelector('.form-row-create');
         formRowCreate.style.display = (formRowCreate.style.display === 'none' || formRowCreate.style.display === '') ? 'table-row' : 'none';
     }
@@ -188,11 +178,9 @@
         var nuevoCostoInput = document.getElementById('nuevoCosto');
         var nuevoCostoValue = nuevoCostoInput.value;
 
-        // Get the servicioId from the hidden input field
         var servicioId = document.getElementById('hiddenServicioId').value;
         var url = '/updateServicio/' + servicioId;
 
-        // Make an AJAX call to update the servicio details
         fetch(url, {
             method: 'PUT',
             headers: {
@@ -205,7 +193,6 @@
         })
         .then(response => {
             if (response.ok) {
-                // Reload the page to reflect the changes
                 location.reload();
             } else {
                 console.error('Error updating servicio details');
@@ -231,7 +218,6 @@
         var nuevoCostoCreateInput = document.getElementById('nuevoCostoCreate');
         var nuevoCostoCreateValue = nuevoCostoCreateInput.value;
 
-        // Make an AJAX call to create a new servicio
         fetch('/createServicio', {
             method: 'POST',
             headers: {
@@ -244,7 +230,6 @@
         })
         .then(response => {
             if (response.ok) {
-                // Reload the page to reflect the changes
                 location.reload();
             } else {
                 console.error('Error creating new servicio');

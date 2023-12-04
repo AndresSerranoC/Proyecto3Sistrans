@@ -32,13 +32,10 @@ public class TipoHabitacionController {
     @ResponseBody
     public ResponseEntity<String> updateTipo(@PathVariable String id, @RequestParam String nombre) {
         try {
-            // Retrieve the tipo from the repository
             TipoHabitacion tipo = tipoRepository.findById(id).orElse(null);
 
             if (tipo != null) {
-                // Update the name
                 tipo.setNombre(nombre);
-                // Save the updated tipo to the repository
                 tipoRepository.save(tipo);
                 return ResponseEntity.ok("Name updated successfully");
             } else {
@@ -53,11 +50,9 @@ public class TipoHabitacionController {
     @ResponseBody
     public ResponseEntity<String> createTipo(@RequestParam String nombre) {
         try {
-            // Create a new tipo
             TipoHabitacion nuevoTipo = new TipoHabitacion();
             nuevoTipo.setNombre(nombre);
 
-            // Save the new tipo to the repository
             tipoRepository.save(nuevoTipo);
 
             return ResponseEntity.ok("Tipo created successfully");
@@ -70,17 +65,13 @@ public class TipoHabitacionController {
     @ResponseBody
     public ResponseEntity<String> deleteTipo(@PathVariable String id) {
         try {
-            // Find the tipo by ID
             TipoHabitacion tipo = tipoRepository.findById(id).orElse(null);
 
             if (tipo != null) {
-                // Find all habitaciones with the specified tipo ID
                 List<Habitacion> habitaciones = habitacionRepository.findByTipo(id);
 
-                // Delete all habitaciones with the specified tipo ID
                 habitacionRepository.deleteAll(habitaciones);
 
-                // Delete the tipo
                 tipoRepository.deleteById(id);
 
                 return ResponseEntity.ok("Tipo and associated habitaciones deleted successfully");

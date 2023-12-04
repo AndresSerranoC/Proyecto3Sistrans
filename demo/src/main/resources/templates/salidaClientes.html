@@ -26,7 +26,7 @@
         }
 
         h1 {
-            color: #800080; /* Purple */
+            color: #800080;
         }
 
         table {
@@ -42,23 +42,20 @@
         }
 
         th {
-            background-color: #800080; /* Purple */
+            background-color: #800080; 
             color: white;
         }
 
-        /* Updated style for the button column */
         .acciones-column button {
             background-color: #4CAF50;
             color: white;
         }
 
-        /* Updated style for all buttons to be green */
         button {
             background-color: #4CAF50;
             color: white;
         }
 
-        /* Updated style for the form row */
         .form-row,
         .form-row-update,
         .form-row-delete {
@@ -79,7 +76,7 @@
                     <th>Nombre</th>
                     <th>Apellido</th>
                     <th>Fecha Llegada</th>
-                    <th>Acciones</th> <!-- New column for actions -->
+                    <th>Acciones</th> 
                 </tr>
             </thead>
             <tbody th:each="cliente : ${clientes}">
@@ -89,10 +86,8 @@
                     <td th:text="${cliente.apellido}"></td>
                     <td>
                         <ul>
-                            <!-- Loop through each fecha for the client -->
                             <li th:each="fecha, fechaStat : ${cliente.fechaSalida}">
                                 <span th:text="${#dates.format(fecha, 'yyyy-MM-dd')}"></span>
-                                <!-- Button and form for updating each fecha -->
                                 <button th:data-clienteId="${cliente.id}" th:data-fechaIndex="${fechaStat.index}" onclick="handleUpdateButton(this)">U</button>
                                 <form th:action="@{/salidaClientes/updateFecha}" method="post" class="form-row-update" style="display: none;">
                                     <input type="hidden" name="clienteId" th:value="${cliente.id}" />
@@ -101,7 +96,6 @@
                                     <input type="date" id="nuevaFecha" name="nuevaFecha" th:value="${#dates.format(fecha, 'yyyy-MM-dd')}" required />
                                     <input type="submit" value="Actualizar Fecha">
                                 </form>
-                                <!-- Button and form for deleting each fecha -->
                                 <button th:data-clienteId="${cliente.id}" th:data-fechaIndex="${fechaStat.index}" onclick="handleDeleteButton(this)">D</button>
                                 <form th:action="@{/salidaClientes/deleteFecha}" method="post" class="form-row-delete" style="display: none;">
                                     <input type="hidden" name="clienteId" th:value="${cliente.id}" />
@@ -111,7 +105,6 @@
                         </ul>
                     </td>
                     <td class="acciones-column">
-                        <!-- Button and form for creating a new fecha for the client -->
                         <button th:data-clienteId="${cliente.id}" onclick="handleCreateButton(this)">C</button>
                         <form th:action="@{/salidaClientes/createFecha}" method="post" class="form-row" style="display: none;">
                             <input type="hidden" name="clienteId" th:value="${cliente.id}" />
@@ -127,23 +120,19 @@
 
     <script>
         function handleCreateButton(button) {
-            // Toggle visibility of the create form row
             var formRow = button.nextElementSibling;
             formRow.style.display = (formRow.style.display === 'none' || formRow.style.display === '') ? 'table-row' : 'none';
         }
     
         function handleUpdateButton(button) {
-            // Toggle visibility of the update form row
             var formRowUpdate = button.nextElementSibling;
             formRowUpdate.style.display = (formRowUpdate.style.display === 'none' || formRowUpdate.style.display === '') ? 'table-row' : 'none';
         }
         function handleDeleteButton(button) {
-            // Ensure that the delete confirmation is required (you can customize this part)
             if (true) {
                 var clienteId = button.getAttribute('data-clienteId');
                 var fechaIndex = button.getAttribute('data-fechaIndex');
     
-                // Use fetch to make a POST request to the delete endpoint
                 fetch('/salidaClientes/deleteFecha', {
                     method: 'POST',
                     headers: {
@@ -153,7 +142,6 @@
                 })
                 .then(response => {
                     if (response.ok) {
-                        // Refresh the page after successful deletion
                         window.location.reload();
                     } else {
                         console.error('Error deleting data');

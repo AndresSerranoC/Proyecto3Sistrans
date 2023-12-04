@@ -91,7 +91,6 @@ public class HabitacionController {
             nuevaHabitacion.setEstado(estado);
             nuevaHabitacion.setTarifa(Double.parseDouble(tarifa));
 
-            // Save the new habitacion to the repository
             habitacionRepository.save(nuevaHabitacion);
 
             return ResponseEntity.ok("Habitacion created successfully");

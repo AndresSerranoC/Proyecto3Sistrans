@@ -27,7 +27,6 @@
 
         h1 {
             color: #800080;
-            /* Purple */
         }
 
         table {
@@ -45,23 +44,19 @@
 
         th {
             background-color: #800080;
-            /* Purple */
             color: white;
         }
 
-        /* Updated style for the button column */
         .acciones-column button {
             background-color: #4CAF50;
             color: white;
         }
 
-        /* Updated style for all buttons to be green */
         button {
             background-color: #4CAF50;
             color: white;
         }
 
-        /* Updated style for the form rows */
         .form-row,
         .form-row-create {
             display: none;
@@ -82,7 +77,6 @@
                     <th>Acciones</th>
                     <th>
                         <button onclick="handleCreateButton()">C</button>
-                        <!-- New column for Create and Delete buttons -->
                     </th>
                 </tr>
             </thead>
@@ -98,12 +92,10 @@
                     </td>
                 </tr>
 
-                <!-- Form row for updating a tipo -->
                 <tr class="form-row" style="display: none;">
                     <td></td>
                     <td>
                         <form onsubmit="handleSubmit(event)">
-                            <!-- Hidden input for tipoId -->
                             <input type="hidden" id="hiddenTipoId" name="hiddenTipoId" value="">
                             <label for="nuevoTipo">Nuevo tipo:</label>
                             <input type="text" id="nuevoTipo" name="nuevoTipo">
@@ -113,7 +105,6 @@
                     <td></td>
                 </tr>
 
-                <!-- Form row for creating a new tipo -->
                 <tr class="form-row-create" style="display: none;">
                     <td></td>
                     <td>
@@ -134,16 +125,13 @@
         function handleButtonClick(button) {
             var tipoId = button.getAttribute('data-tipoId');
 
-            // Set the tipoId in the hidden input field
             document.getElementById('hiddenTipoId').value = tipoId;
 
-            // Toggle visibility of the update form row
             var formRow = document.querySelector('.form-row');
             formRow.style.display = (formRow.style.display === 'none' || formRow.style.display === '') ? 'table-row' : 'none';
         }
 
         function handleCreateButton() {
-            // Toggle visibility of the create form row
             var formRowCreate = document.querySelector('.form-row-create');
             formRowCreate.style.display = (formRowCreate.style.display === 'none' || formRowCreate.style.display === '') ? 'table-row' : 'none';
         }
@@ -152,7 +140,6 @@
             var tipoId = button.getAttribute('data-tipoId');
             var url = '/deleteTipo/' + tipoId;
 
-            // Make an AJAX call to delete the tipo
             fetch(url, {
                     method: 'DELETE',
                     headers: {
@@ -161,7 +148,6 @@
                 })
                 .then(response => {
                     if (response.ok) {
-                        // Reload the page to reflect the changes
                         location.reload();
                     } else {
                         console.error('Error deleting tipo');
@@ -178,11 +164,9 @@
             var nuevoTipoInput = document.getElementById('nuevoTipo');
             var nuevoTipoValue = nuevoTipoInput.value;
 
-            // Get the tipoId from the hidden input field
             var tipoId = document.getElementById('hiddenTipoId').value;
             var url = '/updateTipo/' + tipoId;
 
-            // Make an AJAX call to update the tipo name
             fetch(url, {
                     method: 'PUT',
                     headers: {
@@ -192,7 +176,6 @@
                 })
                 .then(response => {
                     if (response.ok) {
-                        // Reload the page to reflect the changes
                         location.reload();
                     } else {
                         console.error('Error updating name');
@@ -209,7 +192,6 @@
             var nuevoTipoCreateInput = document.getElementById('nuevoTipoCreate');
             var nuevoTipoCreateValue = nuevoTipoCreateInput.value;
 
-            // Make an AJAX call to create a new tipo
             fetch('/createTipo', {
                     method: 'POST',
                     headers: {
@@ -219,7 +201,6 @@
                 })
                 .then(response => {
                     if (response.ok) {
-                        // Reload the page to reflect the changes
                         location.reload();
                     } else {
                         console.error('Error creating new tipo');

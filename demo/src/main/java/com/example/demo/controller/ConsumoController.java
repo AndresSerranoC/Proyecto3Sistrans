@@ -71,7 +71,6 @@ public class ConsumoController {
             consumo.setCantidad(Integer.parseInt(cantidad));
             consumo.setTotal(Double.parseDouble(total));
 
-            // Save the new tipo to the repository
             consumoRepository.save(consumo);
 
             return ResponseEntity.ok("Consumo created successfully");
